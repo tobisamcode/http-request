@@ -29,6 +29,7 @@
         <p
           v-if="invalidInput"
         >One or more input fields are invalid. Please check your provided data.</p>
+        <p v-else-if="error">{{ error }} </p>
         <div>
           <base-button>Submit</base-button>
         </div>
@@ -44,6 +45,7 @@ export default {
       enteredName: '',
       chosenRating: null,
       invalidInput: false,
+      error: null
     };
   },
   // emits: ['survey-submit'],
@@ -59,14 +61,24 @@ export default {
       //   userName: this.enteredName,
       //   rating: this.chosenRating,
       // });
-
+      this.error = null
       fetch('https://vue-http-demo-977d6-default-rtdb.firebaseio.com/surveys.json', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ name: this.enteredName, rating: this.chosenRating}),
-      });
+      }).then((response) => {
+        if (response.ok) {
+          //...
+        }
+        else{
+          throw new Error('Could not save data!')
+        }
+      }).catch((error) => {
+        console.log(error)
+        this.error = error.message;
+      })
 
       this.enteredName = '';
       this.chosenRating = null;
